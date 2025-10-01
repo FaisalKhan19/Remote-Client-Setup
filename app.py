@@ -23,7 +23,6 @@ def marketOrder():
     side = request.args.get('side')
     symbol = request.args.get('symbol')
     qty = request.args.get('qty')
-
     res = client.place_market_order(symbol, side, qty)
     return jsonify(res)
 
@@ -31,6 +30,10 @@ def marketOrder():
 def accInfo():
     info = client.get_account_info()
     return jsonify(info)
+
+@app.route('/syncTime', methods=['GET'])
+def syncTime():
+    return client._sync_time()
 
 @app.route('/chLeverage', methods=['POST'])
 def chLeverage():
