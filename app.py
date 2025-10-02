@@ -6,12 +6,8 @@ app = Flask(__name__)
 @app.route('/setCredentials', methods=['POST'])
 def setCredentials():
     global client
-    data = request.get_json()
-    if not data or 'key' not in data or 'secret' not in data:
-        return jsonify({'success': False, 'error': 'Missing key or secret'}), 400
-
-    key = data['key']
-    secret = data['secret']
+    key = request.args.get('key')
+    secret = request.args.get('secret')
     client = AsterDEXClient(key, secret)
     return jsonify({'success': True, 'message': 'Credentials set successfully'})
 
