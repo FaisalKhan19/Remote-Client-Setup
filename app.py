@@ -1,14 +1,19 @@
 from flask import Flask, jsonify, request
 from aster_dex_trading import AsterDEXClient
-import configparser
-
-config = configparser.ConfigParser()
-config.read("config.ini")
-global client
-client = AsterDEXClient(api_key=config['AsterDex']['API_KEY'],
-                        api_secret=config['AsterDex']['API_SECRET'])
 
 app = Flask(__name__)
+
+@app.route('/setCredentials', methods=['POST'])
+def setCredentials():
+    global client
+    data = request.get_json()
+    if not data or 'key' not in data or 'secret' not in data:
+        return jsonify({'success': False, 'error': 'Missing key or secret'}), 400
+
+    key = data['key']
+    secret = data['secret']
+    client = AsterDEXClient(key, secret)
+    return jsonify({'success': True, 'message': 'Credentials set successfully'})
 
 @app.route('/ping')
 def ping():
@@ -34,6 +39,11 @@ def accInfo():
 @app.route('/syncTime', methods=['GET'])
 def syncTime():
     return client._sync_time()
+
+@app.route('/posInfo', methods=['GET'])
+def posInfo():
+    symbol = request.args.get('symbol')
+    return client.get_position_info(symbol)
 
 @app.route('/chLeverage', methods=['POST'])
 def chLeverage():
